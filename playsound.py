@@ -14,4 +14,4 @@ def play_loud_sound(file_path):
 
 
 if __name__ == "__main__":
-    play_loud_sound("jumpscare.mp3")
+    play_loud_sound("jumpscare_media/jumpscare.mp3")
