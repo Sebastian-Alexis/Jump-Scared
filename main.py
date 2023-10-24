@@ -2,6 +2,11 @@ import cv2
 import dlib
 import time
 from deepface import DeepFace
+import subprocess
+
+# Set the below to false if not on mac, otherwise running playsound.py will fail.
+onmac = True
+
 
 # Initialize Dlib's face detector
 detector = dlib.get_frontal_face_detector()
@@ -44,10 +49,16 @@ while True:
                 neutral_start_time = time.time()
             elif time.time() - neutral_start_time >= 15:
                 print("User has been neutral for over 15 seconds!")
+
+                # Call the playsound.py script
+                if onmac == True:
+                    subprocess.run(
+                        ["python3", "playsound.py"])
+                else:
+                    subprocess.run(
+                        ["python", "playsound.py"])
                 # Reset the timer
                 neutral_start_time = None
-        else:
-            neutral_start_time = None
 
         # Display the emotion on the frame
         cv2.putText(frame, emotion, (x, y),
