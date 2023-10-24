@@ -1,5 +1,6 @@
 import cv2
 import dlib
+import time
 from deepface import DeepFace
 
 # Initialize Dlib's face detector
@@ -7,6 +8,8 @@ detector = dlib.get_frontal_face_detector()
 
 # Start the video capture
 cap = cv2.VideoCapture(0)
+
+neutral_start_time = None
 
 while True:
     ret, frame = cap.read()
@@ -31,10 +34,20 @@ while True:
 
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
-        # Use DeepFace to predict emotion of the detected face
         result = DeepFace.analyze(img_path=roi_color, actions=[
                                   'emotion'], enforce_detection=False)
         emotion = result[0]['dominant_emotion']
+
+        # Check if emotion is neutral
+        if emotion == "neutral":
+            if neutral_start_time is None:
+                neutral_start_time = time.time()
+            elif time.time() - neutral_start_time >= 15:
+                print("User has been neutral for over 15 seconds!")
+                # Reset the timer
+                neutral_start_time = None
+        else:
+            neutral_start_time = None
 
         # Display the emotion on the frame
         cv2.putText(frame, emotion, (x, y),
