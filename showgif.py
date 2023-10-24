@@ -1,37 +1,59 @@
-from PIL import Image, ImageTk
 import tkinter as tk
-import time
+from PIL import Image, ImageTk
 
 
-def update_image(label, frames, frame_idx):
-    frame = frames[frame_idx]
-    label.config(image=frame)
-    label.image = frame
-    label.after(frames[frame]['duration'], update_image,
-                label, frames, (frame_idx + 1) % len(frames))
+class AnimatedGif(tk.Label):
+    def __init__(self, master, path):
+        im = Image.open(path)
+        seq = []
+
+        # Screen dimensions
+        screen_width = master.winfo_screenwidth()
+        screen_height = master.winfo_screenheight()
+
+        # Process each frame and resize
+        for i in range(im.n_frames):
+            # Resize frame to screen size
+            resized_frame = im.copy().resize((screen_width, screen_height), Image.ANTIALIAS)
+            photo = ImageTk.PhotoImage(resized_frame)
+
+            im.seek(i)
+            seq.append((photo, im.info['duration']))
+
+        self.frames = seq
+
+        tk.Label.__init__(self, master, image=seq[0][0])
+        self.image = seq[0][0]
+        self.idx = 0
+        self.cancel = None
+        self.animation()
+
+    def animation(self):
+        self.config(image=self.frames[self.idx][0])
+        self.idx += 1
+        if self.idx == len(self.frames):
+            self.idx = 0
+        self.cancel = self.after(self.frames[self.idx][1], self.animation)
 
 
-def show_gif(gif_path, duration):
+def show_gif(gif_path):
     root = tk.Tk()
-    root.overrideredirect(True)  # Removes the title bar
-    # Places the window at the top left corner
-    root.geometry("+{}+{}".format(0, 0))
+    root.overrideredirect(True)
 
-    # Extract frames from GIF for animation
-    with Image.open(gif_path) as img:
-        frames = [{'image': ImageTk.PhotoImage(img.copy().convert(
-            'RGBA')), 'duration': img.info['duration']} for _ in range(img.n_frames)]
+    # Fullscreen mode
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    root.geometry(f"{screen_width}x{screen_height}+0+0")
 
-    lbl = tk.Label(root)
-    lbl.pack(fill=tk.BOTH, expand=tk.YES)
+    gif = AnimatedGif(root, gif_path)
+    gif.pack(expand=True, fill=tk.BOTH)
 
-    # Start the GIF animation
-    update_image(lbl, frames, 0)
+    # Auto-close after 5s
+    root.after(5000, root.destroy)
 
-    root.after(duration, root.destroy)
     root.mainloop()
 
 
 if __name__ == "__main__":
-    duration = 5000
-    show_gif("jumpscare_media/jumpscare.gif", duration)
+    # TODO: Add arg parser for gif_path later?
+    show_gif("jumpscare_media/jumpscare.gif")
