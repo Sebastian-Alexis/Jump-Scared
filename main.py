@@ -53,8 +53,14 @@ while True:
                 # Call the playsound.py script
                 if onmac == True:
                     subprocess.run(
+                        ["python3", "showgif.py"])
+
+                    subprocess.run(
                         ["python3", "playsound.py"])
+
                 else:
+                    subprocess.run(
+                        ["python", "playsound.py"])
                     subprocess.run(
                         ["python", "playsound.py"])
                 # Reset the timer
