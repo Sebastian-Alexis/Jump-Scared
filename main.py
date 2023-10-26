@@ -48,7 +48,7 @@ while True:
         if emotion == "neutral":
             if neutral_start_time is None:
                 neutral_start_time = time.time()
-            elif time.time() - neutral_start_time >= 1:
+            elif time.time() - neutral_start_time >= 15:
                 print("Neutral for over 15 seconds!")
 
                 # Show the hidden GIF windows
