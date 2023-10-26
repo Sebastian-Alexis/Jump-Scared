@@ -4,15 +4,17 @@ import time
 from deepface import DeepFace
 import subprocess
 
-# Set the below to false if not on mac, otherwise running playsound.py will fail.
+# set the below to false if not on mac, otherwise running playsound.py will fail.
 onmac = True
-
 
 # Initialize Dlib's face detector
 detector = dlib.get_frontal_face_detector()
 
 # Start the video capture
 cap = cv2.VideoCapture(0)
+
+# Create and hide the GIF windows on all screens
+gif_path = "jumpscare_media/jumpscare.gif"
 
 neutral_start_time = None
 
@@ -33,7 +35,7 @@ while True:
         w = rect.width()
         h = rect.height()
 
-        margin = int(h * 0.1)  # Calculate the margin
+        margin = int(h * 0.1)  # margin calc
         roi_color = frame[max(y-margin, 0):min(y+h+margin, frame.shape[0]),
                           max(x-margin, 0):min(x+w+margin, frame.shape[1])]
 
@@ -43,30 +45,30 @@ while True:
                                   'emotion'], enforce_detection=False)
         emotion = result[0]['dominant_emotion']
 
-        # Check if emotion is neutral
         if emotion == "neutral":
             if neutral_start_time is None:
                 neutral_start_time = time.time()
-            elif time.time() - neutral_start_time >= 15:
-                print("User has been neutral for over 15 seconds!")
+            elif time.time() - neutral_start_time >= 1:
+                print("Neutral for over 15 seconds!")
 
-                # Call the playsound.py script
-                if onmac == True:
-                    subprocess.run(
-                        ["python3", "showgif.py"])
+                # Show the hidden GIF windows
 
-                    subprocess.run(
-                        ["python3", "playsound.py"])
-
+                # Play the sound
+                if onmac:
+                    subprocess.Popen(["python3", "showgif.py"])
+                    # the below delay is for demo purposes, my computer is too slow to open showgif.py immediatly with playsound.py.
+                    time.sleep(2)
+                    subprocess.Popen(["python3", "playsound.py"])
+                    time.sleep(5)
                 else:
-                    subprocess.run(
-                        ["python", "playsound.py"])
-                    subprocess.run(
-                        ["python", "playsound.py"])
-                # Reset the timer
-                neutral_start_time = None
+                    subprocess.run(["python", "playsound.py"])
+                    subprocess.run(["python", "showgif.py"])
 
-        # Display the emotion on the frame
+                neutral_start_time = None  # reset timer
+        else:
+            neutral_start_time = None  # reset timer if not neutral
+
+        # Show emotion on frame
         cv2.putText(frame, emotion, (x, y),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
