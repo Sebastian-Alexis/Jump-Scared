@@ -1,7 +1,5 @@
 # Jump-Scared: Halloween Emotion Detection Project
 
-![Project Banner](./jumpscare_media/jumpscarebanner.png)
-
 Jump-Scared is a Halloween-themed project made for [Spooky Software Hackathon](https://spooky-software-hackathon.devpost.com/). Jump-Scared aims to surprise its users with a spooky twist! Using advanced emotion detection techniques, when a user maintains a "neutral" expression for over 15 seconds, the program plays a jump scare sound and locks their screen with a scary gif, giving them a good Halloween scare!
 
 ## Setup
